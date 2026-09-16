@@ -16,6 +16,13 @@ const BADGE_STYLE: Record<BadgeKind, { color: string; icon: () => SVGSVGElement 
   'county-year': { color: '#00838F', icon: createCalendarIcon },
 };
 
+const ROW_HIGHLIGHT_COLOR: Record<BadgeKind, string> = {
+  'world-life': 'rgba(198, 40, 40, 0.15)',
+  'world-year': 'rgba(178, 106, 0, 0.15)',
+  'county-life': 'rgba(21, 101, 192, 0.15)',
+  'county-year': 'rgba(0, 131, 143, 0.15)',
+};
+
 /**
  * Plan 5.7: world badge first, then county badge; life takes priority
  * over year within each scope.
@@ -86,6 +93,25 @@ export function renderBadges(
 
 export function removeAllBadges(root: ParentNode = document): void {
   root.querySelectorAll('[data-uee-badge]').forEach((el) => el.remove());
+}
+
+/**
+ * Highlights the whole row in a faint version of the highest-priority badge
+ * colour. `kinds` is expected in the same world-then-county, life-then-year
+ * priority order `decideBadges` returns, so the first entry wins.
+ */
+export function applyRowHighlight(row: Element, kinds: BadgeKind[]): void {
+  const kind = kinds[0];
+  if (!kind || !(row instanceof HTMLElement)) return;
+  row.setAttribute('data-uee-row-highlight', kind);
+  row.style.setProperty('background-color', ROW_HIGHLIGHT_COLOR[kind], 'important');
+}
+
+export function removeAllRowHighlights(root: ParentNode = document): void {
+  root.querySelectorAll<HTMLElement>('[data-uee-row-highlight]').forEach((el) => {
+    el.removeAttribute('data-uee-row-highlight');
+    el.style.removeProperty('background-color');
+  });
 }
 
 export function clearProcessedMarks(root: ParentNode = document): void {

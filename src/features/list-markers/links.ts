@@ -5,6 +5,7 @@ const NON_SPECIES_COMMON_NAME_HINTS = [' sp.', '/', ' x ', '(', 'Domestic'];
 export interface SpeciesLink {
   anchor: HTMLAnchorElement;
   code: string;
+  row: Element;
   /** true if the full-species check fell back to the common-name heuristic (5.6, rule 2) */
   usedFallbackRule: boolean;
 }
@@ -65,7 +66,7 @@ export function findSpeciesLinks(root: ParentNode = document): {
     if (!mark) continue;
 
     if (usedFallbackRule) fallbackUsed = true;
-    links.push({ anchor, code: match[1]!, usedFallbackRule });
+    links.push({ anchor, code: match[1]!, row: findRowContainer(anchor), usedFallbackRule });
   }
 
   return { links, fallbackUsed };

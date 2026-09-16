@@ -1,5 +1,6 @@
 import type { Feature } from '../../core/feature';
-import { onStorageChanged, type ListCache } from '../../core/storage';
+import { onStorageChanged, SETTINGS_KEY, type ListCache } from '../../core/storage';
+import { loadSettings } from '../../core/settings';
 import { detectCounty } from './county';
 import { findSpeciesLinks } from './links';
 import { fetchList } from './fetch-parse';
@@ -13,7 +14,15 @@ import {
   writeListCache,
   type ListId,
 } from './lists';
-import { decideBadges, removeAllBadges, renderBadges, clearProcessedMarks, type ListSets } from './badges';
+import {
+  decideBadges,
+  removeAllBadges,
+  removeAllRowHighlights,
+  applyRowHighlight,
+  renderBadges,
+  clearProcessedMarks,
+  type ListSets,
+} from './badges';
 
 const WORLD_LIFE: ListId = { region: 'world', period: 'life' };
 const WORLD_YEAR: ListId = { region: 'world', period: 'year' };
@@ -61,13 +70,15 @@ async function ensureFetched(id: ListId): Promise<void> {
 
 async function annotate(countyId: ListId | undefined, countyName: string | undefined): Promise<void> {
   removeAllBadges();
+  removeAllRowHighlights();
   clearProcessedMarks();
 
-  const [worldLife, worldYear, countyLife, countyYear] = await Promise.all([
+  const [worldLife, worldYear, countyLife, countyYear, settings] = await Promise.all([
     readListCache(WORLD_LIFE),
     readListCache(WORLD_YEAR),
     countyId ? readListCache({ region: countyId.region, period: 'life' }) : Promise.resolve(undefined),
     countyId ? readListCache({ region: countyId.region, period: 'year' }) : Promise.resolve(undefined),
+    loadSettings(),
   ]);
 
   const sets: ListSets = {
@@ -81,9 +92,10 @@ async function annotate(countyId: ListId | undefined, countyName: string | undef
   const { links } = findSpeciesLinks(document);
   const year = currentYear();
 
-  for (const { anchor, code } of links) {
+  for (const { anchor, row, code } of links) {
     const kinds = decideBadges(code, sets, hasCounty);
     renderBadges(anchor, kinds, year, countyName);
+    if (settings.highlightRows) applyRowHighlight(row, kinds);
   }
 }
 
@@ -124,10 +136,12 @@ export const listMarkersFeature: Feature = {
       annotate(countyId, countyName),
     );
 
-    // Step 5: react to any tab updating a required list.
+    // Step 5: react to any tab updating a required list, or to settings
+    // changes (e.g. toggling row highlighting) from the options page.
     const requiredKeys = new Set(requiredIds.map((id) => `list:${id.region}:${id.period}`));
     onStorageChanged((changes) => {
-      const relevant = Object.keys(changes).some((key) => requiredKeys.has(key));
+      const relevant =
+        Object.keys(changes).some((key) => requiredKeys.has(key)) || SETTINGS_KEY in changes;
       if (relevant) void annotate(countyId, countyName);
     });
   },

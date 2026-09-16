@@ -3,7 +3,7 @@
   "description": "Unofficial browser extension adding life/year list status badges to species links on ebird.org. Not affiliated with eBird or the Cornell Lab of Ornithology.",
   "private": true,
   "license": "MIT",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",

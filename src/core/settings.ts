@@ -6,7 +6,7 @@ export function defaultSettings(): Settings {
   for (const feature of features) {
     settingsFeatures[feature.id] = { enabled: feature.defaultEnabled };
   }
-  return { features: settingsFeatures };
+  return { features: settingsFeatures, highlightRows: false };
 }
 
 export async function loadSettings(): Promise<Settings> {
@@ -15,6 +15,7 @@ export async function loadSettings(): Promise<Settings> {
   if (!stored) return defaults;
   return {
     features: { ...defaults.features, ...stored.features },
+    highlightRows: stored.highlightRows ?? defaults.highlightRows,
   };
 }
 

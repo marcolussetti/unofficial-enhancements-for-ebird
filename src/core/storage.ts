@@ -20,6 +20,8 @@ export interface FeatureSetting {
 
 export interface Settings {
   features: Record<string, FeatureSetting>;
+  /** list-markers: highlight the whole row with a faint status colour. Off by default. */
+  highlightRows: boolean;
 }
 
 export function listKey(region: string, period: Period): string {

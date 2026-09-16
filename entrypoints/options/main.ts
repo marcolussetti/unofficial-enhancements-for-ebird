@@ -51,6 +51,17 @@ async function renderFeatures(): Promise<void> {
   }
 }
 
+async function renderHighlightRows(): Promise<void> {
+  const settings = await loadSettings();
+  const checkbox = document.getElementById('highlight-rows-checkbox') as HTMLInputElement;
+  checkbox.checked = settings.highlightRows;
+  checkbox.addEventListener('change', async () => {
+    const current = await loadSettings();
+    current.highlightRows = checkbox.checked;
+    await saveSettings(current);
+  });
+}
+
 async function getListCaches(): Promise<ListCache[]> {
   const all = await storageGetAll();
   const lists: ListCache[] = [];
@@ -124,6 +135,7 @@ function wireActions(): void {
 
 async function init(): Promise<void> {
   await renderFeatures();
+  await renderHighlightRows();
   await renderLists();
   await checkFirefoxPermission();
   wireActions();
