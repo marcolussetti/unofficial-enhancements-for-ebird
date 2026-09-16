@@ -1,0 +1,25 @@
+.uee-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  width: 1.1em !important;
+  height: 1.1em !important;
+  margin: 0 0 0 0.3em !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+  text-decoration: none !important;
+  flex: none !important;
+}
+
+.uee-badge-icon {
+  width: 68% !important;
+  height: 68% !important;
+  display: block !important;
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+}
